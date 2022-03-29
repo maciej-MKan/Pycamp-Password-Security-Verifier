@@ -6,15 +6,17 @@ from passwd import Passwd
 class ServiceUnavailable(Exception):
     """exception when api pwned is no avaible"""
 
-class LeakChecker:
+class LeakCheck:
     """password leak check mechanism"""
 
     def __init__(self, passwd : Passwd ) -> None:
         self.password_prefix = passwd.hash_pass[:5]
         self.password_sufix = passwd.hash_pass[5:]
         self._api_url = 'https://api.pwnedpasswords.com/range/'
-        self._test_prefix = '12345'
-        self.check_password_save()
+        self._test_prefix = 'a94a8'
+
+    def __bool__(self) -> bool:
+        return self.check_password_safe()
 
     def check_connection(self, tries : int) -> bool:
         """check connection wiht api
@@ -31,7 +33,7 @@ class LeakChecker:
                 self.check_connection(tries - 1)
             return test_request.status_code == 200
 
-    def check_password_save(self) -> bool:
+    def check_password_safe(self) -> bool:
         """main method to check for password leakage
 
         Raises:
