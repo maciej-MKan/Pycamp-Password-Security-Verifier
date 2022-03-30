@@ -1,6 +1,6 @@
 """tests for validator.py"""
 
-import pytest
+from pytest import raises
 from passwd import Passwd
 from leak_check import LeakCheck, ServiceUnavailable
 
@@ -35,7 +35,7 @@ def test_check_connection(requests_mock):
 
 def test_check_connection_fail(requests_mock):
     """test exception when connection with api is fail"""
-    with pytest.raises(ServiceUnavailable) as exctinfo:
+    with raises(ServiceUnavailable) as exctinfo:
         requests_mock.get(TEST_URL, text = TEST_RESPONSE, status_code = 404)
         TEST_LEAK_CHECK.check_password_safe()
 
