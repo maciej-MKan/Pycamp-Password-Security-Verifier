@@ -49,9 +49,9 @@ class Validator():
     def check_valid(self) -> bool:
         """checks if the password is > minimum lenght characters long"""
         checks_list = [
-            self.check_len, self.check_uppers,
-            self.check_lowers, self.check_numbers,
-            self.check_specjals
+            self.check_len(), self.check_uppers(),
+            self.check_lowers(), self.check_numbers(),
+            self.check_specjals()
             ]
 
         return all(checks_list)
