@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """check if the password is leaked"""
 from time import sleep
 import requests

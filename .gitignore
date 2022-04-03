@@ -131,3 +131,5 @@ dmypy.json
 # temporary files
 tmp.py
 hasla.txt
+out.txt
+*.log
