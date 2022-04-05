@@ -1,14 +1,25 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 # -*- coding: utf-8 -*-
-"""TO DO"""
+"""script to check password safety
+run:
+fuse.py <file> <-log> <-output>
+file : file name with passwords (see pass.example)
+-log : to create log file
+-output : to create file with safety passwords
+if you run the program directly, it will ask for parameters"""
+
 import logging
 from os.path import isfile
 from sys import argv
 from datetime import datetime
+
 from validator import Validator, VALIDATOR_EXCEPTIONS as ValExcept
 from passwd import Passwd
 from leak_check import LeakCheck, ServiceUnavailable
+
+#pylint: disable=too-few-public-methods
+#pylint: disable=logging-fstring-interpolation
 
 class InputFormer:
     """Checks whether the input data is a file or str and modifies it accordingly"""
@@ -82,7 +93,8 @@ class Fuse:
                 return arg
         return None
 
-    def get_data_from_user(self):
+    @staticmethod
+    def get_data_from_user():
         """prompts the user for passwords"""
         user_data = input("Give me password's file or single password to check: ")
         return user_data
@@ -124,7 +136,6 @@ class Fuse:
     def cerate_log(self, log_data):
         """creating log"""
         self.log = True
-        print('creating log')
         logging.basicConfig(filename='fuse.log', level=logging.INFO, filemode='w')
         logging.info(f'{datetime.now()} - {log_data}')
 
@@ -142,11 +153,14 @@ class Fuse:
 
 if __name__ == '__main__':
     fuse = Fuse()
-    if len(argv) > 1:
-        input_data = fuse.check_start_parameters()
-    else:
-        fuse.get_parameters_from_user()
-        input_data = fuse.get_data_from_user()
-    for i in fuse.check_password_safety(input_data):
-        print(i)
-    del fuse
+    try:
+        if len(argv) > 1:
+            input_data = fuse.check_start_parameters()
+        else:
+            fuse.get_parameters_from_user()
+            input_data = fuse.get_data_from_user()
+        for i in fuse.check_password_safety(input_data):
+            print(i)
+        del fuse
+    except TypeError:
+        print('bad argv')
