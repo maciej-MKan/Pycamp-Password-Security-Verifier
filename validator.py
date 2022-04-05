@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """checks if the password meets the security requirements"""
 from passwd import Passwd
 
@@ -15,6 +18,8 @@ class NoNumber(Exception):
 
 class NoSpecjal(Exception):
     """exception when password does not have specjal characters"""
+
+VALIDATOR_EXCEPTIONS = (TooShort, NoUpperCase, NoLowerCase, NoNumber, NoSpecjal)
 
 class Validator():
     """_summary_
@@ -49,9 +54,9 @@ class Validator():
     def check_valid(self) -> bool:
         """checks if the password is > minimum lenght characters long"""
         checks_list = [
-            self.check_len, self.check_uppers,
-            self.check_lowers, self.check_numbers,
-            self.check_specjals
+            self.check_len(), self.check_uppers(),
+            self.check_lowers(), self.check_numbers(),
+            self.check_specjals()
             ]
 
         return all(checks_list)

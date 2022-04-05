@@ -1,6 +1,11 @@
+#!/usr/bin/env python
+# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """check if the password is leaked"""
 from time import sleep
 import requests
+from requests.exceptions import ConnectionError
+from urllib3.exceptions import NewConnectionError, MaxRetryError
 from passwd import Passwd
 
 class ServiceUnavailable(Exception):
@@ -27,11 +32,14 @@ class LeakCheck:
         Returns:
             bool: whether connection with api is avaible
         """
-        with requests.get(self._api_url + self._test_prefix) as test_request:
-            if test_request.status_code != 200 and tries > 1:
-                sleep(5)
-                self.check_connection(tries - 1)
-            return test_request.status_code == 200
+        try:
+            with requests.get(self._api_url + self._test_prefix) as test_request:
+                if test_request.status_code != 200 and tries > 1:
+                    sleep(5)
+                    self.check_connection(tries - 1)
+                return test_request.status_code == 200
+        except (ConnectionError, NewConnectionError, MaxRetryError):
+            raise ServiceUnavailable('no internet connection')
 
     def check_password_safe(self) -> bool:
         """main method to check for password leakage
@@ -43,6 +51,7 @@ class LeakCheck:
             bool: whether the password is secure
         """
         password_security = False
+
         if not self.check_connection(2):
             raise ServiceUnavailable('api pwned is no avaible')
 

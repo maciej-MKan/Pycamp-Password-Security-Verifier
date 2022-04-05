@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """gnerate password object"""
 
 from hashlib import sha1
