@@ -10,7 +10,7 @@ file : file name with passwords (see pass.example)
 if you run the program directly, it will ask for parameters"""
 
 import logging
-from os.path import isfile
+from os import path
 from sys import argv
 from datetime import datetime
 
@@ -32,7 +32,7 @@ class InputFormer:
         Yields:
             str: single password
         """
-        if isfile(self.input_data):
+        if path.isfile(self.input_data):
             with open(self.input_data, 'r', encoding='utf-8') as passwd_file:
                 for passwd in passwd_file:
                     yield passwd
@@ -65,7 +65,7 @@ class PasswordChecker:
                     safe = 'not valid'
                 yield passwd.raw_pass, safe
             except ValExcept as err:
-                yield passwd.raw_pass, err
+                yield passwd.raw_pass, str(err)
 
 class Fuse:
     """main class with program logic"""
@@ -76,7 +76,7 @@ class Fuse:
     def passwd_output_enable(self):
         """enables the saving of valid passwords to the output file"""
         self.passwd_output = True
-        if isfile('out.txt'):
+        if path.isfile('out.txt'):
             logging.warning(
                 f'{datetime.now()} - out.txt exists. The data will be appended to the file.')
             with open('out.txt', 'a', encoding='utf-8') as file:
@@ -89,7 +89,7 @@ class Fuse:
         if '-output' in argv:
             self.passwd_output_enable()
         for arg in argv[1:]:
-            if isfile(arg):
+            if path.isfile(arg):
                 return arg
         return None
 
