@@ -1,5 +1,6 @@
 """tests for fuse.py"""
 
+from cgi import test
 from sys import argv
 from unittest import mock
 from unittest.mock import patch, mock_open
@@ -13,6 +14,10 @@ TEST_FILE_DATA =\
 line2
 line3
 """
+
+def answer_generator():
+    for i in ['Y', 'N']:
+        yield i
 
 @patch('builtins.open', new_callable=mock_open, read_data=TEST_FILE_DATA)
 @patch('os.path.isfile')
@@ -108,3 +113,52 @@ def test_check_start_parameters_wo_argv(mock_poe, mock_create_log, mock_isfile):
     mock_create_log.assert_not_called()
     mock_isfile.assert_not_called()
     assert test_content is None
+
+@patch('fuse.datetime')
+@patch('os.path.isfile')
+@patch('logging.warning')
+def test_password_output_enable(mock_warning, mock_isfile, mock_datetime):
+    """test password_output_enable with enabled logs"""
+
+    mock_isfile.return_value = True
+    mock_datetime.now.return_value = '2022-04-08 00:00:00'
+    test_fuse = Fuse()
+
+    with patch('builtins.open', mock_open()) as test_file:
+        test_fuse.passwd_output_enable()
+
+    mock_warning.assert_called_with(
+        '2022-04-08 00:00:00 - out.txt exists. The data will be appended to the file.'
+    )
+    mock_isfile.assert_called_with('out.txt')
+    test_file.assert_called_with('out.txt', 'a', encoding='utf-8')
+    test_file().write.assert_called_with('\n2022-04-08 00:00:00\n')
+    assert test_fuse.passwd_output is True
+
+@patch.object(Fuse, 'cerate_log')
+@patch.object(Fuse, 'passwd_output_enable')
+@patch('builtins.input')
+def test_parameters_from_user_with_both(mock_input, mock_poe, mock_log):
+    """test parameters_from_user when both option are selected"""
+    test_fuse = Fuse()
+    mock_input.return_value = 'Y'
+
+    test_fuse.get_parameters_from_user()
+
+    mock_poe.assert_called()
+    mock_log.assert_called()
+
+@patch.object(Fuse, 'cerate_log')
+@patch.object(Fuse, 'passwd_output_enable')
+def test_parameters_from_user_with_log(mock_poe, mock_log):
+    """test parameters_from_user when -log option are selected"""
+    test_fuse = Fuse()
+    #answer_list = ['N', 'Y']
+
+    #mock_input.return_value = answer_list.pop()
+    with patch('builtins.input') as mock_input:
+        mock_input.return_value = 'Y'
+        test_fuse.get_parameters_from_user()
+
+    mock_poe.assert_not_called()
+    mock_log.assert_called()
