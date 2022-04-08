@@ -1,9 +1,12 @@
 """tests for fuse.py"""
 
+from sys import argv
+from unittest import mock
 from unittest.mock import patch, mock_open
 from fuse import Fuse, InputFormer, PasswordChecker
 from validator import Validator
 from leak_check import LeakCheck
+
 
 TEST_FILE_DATA =\
 """line1
@@ -70,3 +73,38 @@ def test_check_valid_and_leak_w_exc(mock_leak_check):
     mock_leak_check.assert_not_called()
     assert test_content ==\
         ('TESTPW1#', 'the password does not have enough lowercases')
+
+@patch('os.path.isfile')
+@patch.object(Fuse, 'cerate_log')
+@patch.object(Fuse, 'passwd_output_enable')
+def test_check_start_parameters_w_all_argv(mock_poe, mock_create_log, mock_isfile):
+    """test check_start_parameters with all sys attribute"""
+
+    mock_isfile.return_value = True
+    test_fuse = Fuse()
+    argv.clear()
+    argv.extend(['dumy_path_to_file', 'test_file', '-log', '-output'])
+
+    test_content = test_fuse.check_start_parameters()
+    
+    mock_poe.assert_called()
+    mock_create_log.assert_called_with('Looging enabled by start parameter')
+    mock_isfile.assert_called_with('test_file')
+    assert test_content == 'test_file'
+
+@patch('os.path.isfile')
+@patch.object(Fuse, 'cerate_log')
+@patch.object(Fuse, 'passwd_output_enable')
+def test_check_start_parameters_wo_argv(mock_poe, mock_create_log, mock_isfile):
+    """test check_start_parameters with out additional sys attribute"""
+    mock_isfile.return_value = False
+
+    test_fuse = Fuse()
+    argv.clear()
+
+    test_content = test_fuse.check_start_parameters()
+    
+    mock_poe.assert_not_called()
+    mock_create_log.assert_not_called()
+    mock_isfile.assert_not_called()
+    assert test_content is None
