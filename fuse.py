@@ -85,7 +85,7 @@ class Fuse:
     def check_start_parameters(self):
         """checks if the script was run with parameters"""
         if '-log' in argv:
-            self.cerate_log('Looging enabled by start parameter')
+            self.create_log('Looging enabled by start parameter')
         if '-output' in argv:
             self.passwd_output_enable()
         for arg in argv[1:]:
@@ -105,7 +105,7 @@ class Fuse:
         while not user_input in ['Y','y','N','n']:
             user_input = input('Turn on Logs? (y/n): ')
             if user_input.lower() == 'y':
-                self.cerate_log('Looging enabled by user')
+                self.create_log('Looging enabled by user')
         user_input = None
         while not user_input in ['Y','y','N','n']:
             user_input = input('Do you wont make output file with safety passwords? (y/n): ')
@@ -133,7 +133,7 @@ class Fuse:
             logging.error(f'{datetime.now()} - {exc}')
             yield None, f'{exc}. Try later'
 
-    def cerate_log(self, log_data):
+    def create_log(self, log_data):
         """creating log"""
         self.log = True
         logging.basicConfig(filename='fuse.log', level=logging.INFO, filemode='w')
